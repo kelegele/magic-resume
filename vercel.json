@@ -1,14 +1,15 @@
 {
   "buildCommand": "pnpm build",
   "outputDirectory": "dist/client",
-  "framework": null,
+  "installCommand": "pnpm install",
   "functions": {
     "api/**/*.ts": {
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 10,
+      "includeFiles": "dist/**"
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/$1" }
+    { "source": "/(.*)", "destination": "/api" }
   ]
 }
