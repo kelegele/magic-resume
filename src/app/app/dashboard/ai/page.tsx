@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, ExternalLink, Sparkles } from "lucide-react";
+import { Bot, Check, ExternalLink, Sparkles } from "lucide-react";
 import { useTranslations } from "@/i18n/compat/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,14 @@ import IconDoubao from "@/components/ai/icon/IconDoubao";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
 import { cn } from "@/lib/utils";
 import IconOpenAi from "@/components/ai/icon/IconOpenAi";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { GlmApiMode } from "@/config/ai";
 
 const AISettingsPage = () => {
   const {
@@ -19,6 +27,10 @@ const AISettingsPage = () => {
     openaiApiEndpoint,
     geminiApiKey,
     geminiModelId,
+    glmApiKey,
+    glmTextModelId,
+    glmVisionModelId,
+    glmApiMode,
     setDoubaoApiKey,
     setDoubaoModelId,
     setDeepseekApiKey,
@@ -27,6 +39,10 @@ const AISettingsPage = () => {
     setOpenaiApiEndpoint,
     setGeminiApiKey,
     setGeminiModelId,
+    setGlmApiKey,
+    setGlmTextModelId,
+    setGlmVisionModelId,
+    setGlmApiMode,
     selectedModel,
     setSelectedModel,
   } = useAIConfigStore();
@@ -40,7 +56,7 @@ const AISettingsPage = () => {
 
   const handleApiKeyChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "doubao" | "deepseek" | "openai" | "gemini"
+    type: "doubao" | "deepseek" | "openai" | "gemini" | "glm"
   ) => {
     const newApiKey = e.target.value;
     if (type === "doubao") {
@@ -49,6 +65,8 @@ const AISettingsPage = () => {
       setDeepseekApiKey(newApiKey);
     } else if (type === "gemini") {
       setGeminiApiKey(newApiKey);
+    } else if (type === "glm") {
+      setGlmApiKey(newApiKey);
     } else {
       setOpenaiApiKey(newApiKey);
     }
@@ -56,7 +74,7 @@ const AISettingsPage = () => {
 
   const handleModelIdChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "doubao" | "deepseek" | "openai" | "gemini"
+    type: "doubao" | "deepseek" | "openai" | "gemini" | "glm"
   ) => {
     const newModelId = e.target.value;
     if (type === "doubao") {
@@ -65,6 +83,8 @@ const AISettingsPage = () => {
       setOpenaiModelId(newModelId);
     } else if (type === "gemini") {
       setGeminiModelId(newModelId);
+    } else if (type === "glm") {
+      setGlmTextModelId(newModelId);
     }
   };
 
@@ -118,6 +138,16 @@ const AISettingsPage = () => {
       color: "text-amber-500",
       bgColor: "bg-amber-50 dark:bg-amber-950/50",
       isConfigured: !!(geminiApiKey && geminiModelId),
+    },
+    {
+      id: "glm",
+      name: t("dashboard.settings.ai.glm.title"),
+      description: t("dashboard.settings.ai.glm.description"),
+      icon: Bot,
+      link: "https://open.bigmodel.cn",
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-50 dark:bg-emerald-950/50",
+      isConfigured: !!(glmApiKey && glmTextModelId),
     },
   ];
 
@@ -173,10 +203,10 @@ const AISettingsPage = () => {
                     aria-label={`Select ${model.name}`}
                     onClick={() => {
                       setSelectedModel(
-                        model.id as "doubao" | "deepseek" | "openai" | "gemini"
+                        model.id as "doubao" | "deepseek" | "openai" | "gemini" | "glm"
                       );
                       setCurrentModel(
-                        model.id as "doubao" | "deepseek" | "openai" | "gemini"
+                        model.id as "doubao" | "deepseek" | "openai" | "gemini" | "glm"
                       );
                     }}
                     className={cn(
@@ -236,12 +266,14 @@ const AISettingsPage = () => {
                             ? openaiApiKey
                             : model.id === "gemini"
                             ? geminiApiKey
+                            : model.id === "glm"
+                            ? glmApiKey
                             : deepseekApiKey
                         }
                         onChange={(e) =>
                           handleApiKeyChange(
                             e,
-                            model.id as "doubao" | "deepseek" | "openai" | "gemini"
+                            model.id as "doubao" | "deepseek" | "openai" | "gemini" | "glm"
                           )
                         }
                         type="password"
@@ -315,6 +347,75 @@ const AISettingsPage = () => {
                             "focus:ring-2 focus:ring-primary/20"
                           )}
                         />
+                      </div>
+                    )}
+
+                    {model.id === "glm" && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          {/* TODO: replace with i18n key */}
+                          <Label className="text-base font-medium">
+                            API 模式
+                          </Label>
+                          <Select
+                            value={glmApiMode}
+                            onValueChange={(value) =>
+                              setGlmApiMode(value as GlmApiMode)
+                            }
+                          >
+                            <SelectTrigger
+                              className={cn(
+                                "h-11",
+                                "bg-white dark:bg-gray-900",
+                                "border-gray-200 dark:border-gray-800",
+                                "focus:ring-2 focus:ring-primary/20"
+                              )}
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {/* TODO: replace with i18n keys */}
+                              <SelectItem value="standard">标准 API</SelectItem>
+                              <SelectItem value="coding">编码套餐</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-base font-medium">
+                            {t("dashboard.settings.ai.glm.textModelId")}
+                          </Label>
+                          <Input
+                            value={glmTextModelId}
+                            onChange={(e) => handleModelIdChange(e, "glm")}
+                            placeholder={t(
+                              "dashboard.settings.ai.glm.textModelId"
+                            )}
+                            className={cn(
+                              "h-11",
+                              "bg-white dark:bg-gray-900",
+                              "border-gray-200 dark:border-gray-800",
+                              "focus:ring-2 focus:ring-primary/20"
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-base font-medium">
+                            {t("dashboard.settings.ai.glm.visionModelId")}
+                          </Label>
+                          <Input
+                            value={glmVisionModelId}
+                            onChange={(e) => setGlmVisionModelId(e.target.value)}
+                            placeholder={t(
+                              "dashboard.settings.ai.glm.visionModelId"
+                            )}
+                            className={cn(
+                              "h-11",
+                              "bg-white dark:bg-gray-900",
+                              "border-gray-200 dark:border-gray-800",
+                              "focus:ring-2 focus:ring-primary/20"
+                            )}
+                          />
+                        </div>
                       </div>
                     )}
 
