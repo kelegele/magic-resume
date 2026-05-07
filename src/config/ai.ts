@@ -1,4 +1,6 @@
-export type AIModelType = "doubao" | "deepseek" | "openai" | "gemini";
+export type AIModelType = "doubao" | "deepseek" | "openai" | "gemini" | "glm";
+
+export type GlmApiMode = "standard" | "coding";
 
 export interface AIValidationContext {
   doubaoApiKey?: string;
@@ -10,6 +12,10 @@ export interface AIValidationContext {
   openaiApiEndpoint?: string;
   geminiApiKey?: string;
   geminiModelId?: string;
+  glmApiKey?: string;
+  glmTextModelId?: string;
+  glmVisionModelId?: string;
+  glmApiMode?: GlmApiMode;
 }
 
 export interface AIModelConfig {
@@ -57,5 +63,17 @@ export const AI_MODEL_CONFIGS: Record<AIModelType, AIModelConfig> = {
       "x-goog-api-key": apiKey,
     }),
     validate: (context: AIValidationContext) => !!(context.geminiApiKey && context.geminiModelId),
+  },
+  glm: {
+    url: (mode?: string) =>
+      mode === "coding"
+        ? "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions"
+        : "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+    requiresModelId: true,
+    headers: (apiKey: string) => ({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    }),
+    validate: (context: AIValidationContext) => !!(context.glmApiKey && context.glmTextModelId),
   },
 };
