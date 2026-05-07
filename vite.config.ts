@@ -16,7 +16,6 @@ export default defineConfig({
   plugins: [
     tsconfigPaths(),
     tanstackStart({
-      target: "vercel",
       srcDirectory: "src",
       router: {
         routesDirectory: "routes"
