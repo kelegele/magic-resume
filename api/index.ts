@@ -46,8 +46,7 @@ export default async function handler(req: any, res: any) {
       chunks.push(Buffer.from(chunk));
     }
     if (chunks.length > 0) {
-      init.body = Buffer.concat(chunks);
-      init.duplex = "half";
+      (init as any).body = Buffer.concat(chunks);
     }
   }
 
@@ -56,7 +55,7 @@ export default async function handler(req: any, res: any) {
     const response = await server.fetch(request);
 
     res.status(response.status);
-    response.headers.forEach((value, key) => {
+    response.headers.forEach((value: string, key: string) => {
       const lower = key.toLowerCase();
       if (lower !== "transfer-encoding") {
         res.setHeader(key, value);
