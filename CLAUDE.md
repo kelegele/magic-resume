@@ -55,7 +55,15 @@ The workbench (`app/workbench/[id]/page.tsx`) uses `react-resizable-panels` for 
 
 ### AI Features
 
-AI integration (`src/config/ai.ts`) supports 4 providers: Doubao, DeepSeek, OpenAI-compatible, and Gemini. API routes under `src/app/api/` handle grammar checking and content polishing. AI config is stored in `useAIConfigStore.ts`.
+AI integration (`src/config/ai.ts`) supports 5 providers: Doubao, DeepSeek, OpenAI-compatible, Gemini, and GLM (智谱AI). API routes under `src/routes/api/` handle grammar checking, content polishing, and PDF resume import. AI config is stored in `useAIConfigStore.ts`.
+
+**Adding a new AI provider** involves:
+1. Register in `AI_MODEL_CONFIGS` (`src/config/ai.ts`) with URL, headers, and validate function
+2. Add state fields + setters in `src/store/useAIConfigStore.ts`
+3. Add config UI card in `src/app/app/dashboard/ai/page.tsx`
+4. Add provider branches in `AIPolishDialog.tsx`, `useGrammarStore.ts`, and `ResumeWorkbench.tsx`
+5. If the provider supports vision, add PDF import branch in `src/routes/api/resume-import.ts`
+6. Add i18n keys in both `src/i18n/locales/zh.json` and `en.json`
 
 ### i18n
 
@@ -79,3 +87,21 @@ Two locales: `zh` (default) and `en`. Translation files at `src/i18n/locales/`. 
 - **Icons**: Lucide React for UI icons, Remix Icon for some components
 - **Font handling**: Custom fonts served from `public/fonts/` with server-side font config in `fonts/`
 - **ESLint config** extends `next/core-web-vitals` (legacy config, not using flat config)
+
+## Vercel Deployment
+
+TanStack Start 1.160 does **not** have a built-in Vercel adapter (no `target: "vercel"` option). Deployment requires a custom serverless function bridge:
+
+- **`vercel.json`** — build config, static output directory (`dist/client`), rewrite rules, `includeFiles`
+- **`api/index.ts`** — catch-all serverless function that loads `dist/server/server.js` at runtime and delegates requests to `server.fetch()`
+
+Key pitfalls to avoid:
+- **Do NOT** add `target: "vercel"` to `tanstackStart()` in `vite.config.ts` — this option does not exist in v1.160
+- **Use runtime path** (`resolve(process.cwd(), ...)`) to import the built server — static imports cause esbuild to fail during Vercel's function bundling
+- **Set `includeFiles: "dist/**"`** in `vercel.json` functions config — Vercel won't include build output in serverless functions by default
+- **Set `bodyParser: false`** — read raw body from `req` stream instead of relying on Vercel's auto-parsing
+- **Watch for TypeScript strict errors** — `RequestInit` doesn't have `duplex`, `forEach` callbacks need explicit types
+
+## Future: Desktop App
+
+项目可以封装为可安装的桌面应用，推荐方案是 **Tauri**（Rust webview，包体 ~5-10MB）。项目本质接近纯前端（数据存 localStorage，AI 调用是前端传 key），适配成本较低。主要改动是把服务端 API 路由（grammar、polish、resume-import）的逻辑移到前端直接调用外部 AI API，去掉对自建服务端的依赖。
