@@ -130,6 +130,7 @@
         "pdfDescription": "使用 Gemini 自动识别生成简历结构",
         "importing": "正在导入，请稍候...",
         "geminiConfigRequired": "请先在 AI 服务商设置页配置 Gemini API Key 和模型 ID",
+        "glmConfigRequired": "请先在 AI 服务商设置页配置 GLM API Key 和视觉模型 ID",
         "pdfSuccess": "PDF 导入成功",
         "pdfError": "PDF 导入失败，请检查 PDF 内容或 Gemini 配置"
       },

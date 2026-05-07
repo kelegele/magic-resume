@@ -44,8 +44,12 @@ export const ResumeWorkbench = () => {
         createResume,
     } = useResumeStore();
     const {
+        selectedModel,
         geminiApiKey,
         geminiModelId,
+        glmApiKey,
+        glmVisionModelId,
+        glmApiMode,
     } = useAIConfigStore();
     const router = useRouter();
     const [hasConfiguredFolder, setHasConfiguredFolder] = useState(false);
@@ -186,7 +190,20 @@ export const ResumeWorkbench = () => {
     };
 
     const importResumeFromPdf = async (file: File) => {
-        if (!geminiApiKey || !geminiModelId) {
+        // Check if the current provider supports PDF import
+        if (selectedModel === "gemini") {
+            if (!geminiApiKey || !geminiModelId) {
+                toast.error(t("dashboard.resumes.importDialog.geminiConfigRequired"));
+                router.push("/app/dashboard/ai");
+                return;
+            }
+        } else if (selectedModel === "glm") {
+            if (!glmApiKey || !glmVisionModelId) {
+                toast.error(t("dashboard.resumes.importDialog.glmConfigRequired"));
+                router.push("/app/dashboard/ai");
+                return;
+            }
+        } else {
             toast.error(t("dashboard.resumes.importDialog.geminiConfigRequired"));
             router.push("/app/dashboard/ai");
             return;
@@ -197,17 +214,31 @@ export const ResumeWorkbench = () => {
             throw new Error("No extractable PDF pages");
         }
 
+        // Build request body based on provider
+        const requestBody =
+            selectedModel === "glm"
+                ? {
+                    images: pdfImages,
+                    apiKey: glmApiKey,
+                    visionModel: glmVisionModelId,
+                    apiMode: glmApiMode,
+                    locale,
+                    provider: "glm" as const,
+                }
+                : {
+                    images: pdfImages,
+                    apiKey: geminiApiKey,
+                    model: geminiModelId,
+                    locale,
+                    provider: "gemini" as const,
+                };
+
         const response = await fetch("/api/resume-import", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                images: pdfImages,
-                apiKey: geminiApiKey,
-                model: geminiModelId,
-                locale,
-            }),
+            body: JSON.stringify(requestBody),
         });
 
         const data = await response.json();
