@@ -353,9 +353,8 @@ const AISettingsPage = () => {
                     {model.id === "glm" && (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          {/* TODO: replace with i18n key */}
                           <Label className="text-base font-medium">
-                            API 模式
+                            {t("dashboard.settings.ai.glm.apiModeLabel")}
                           </Label>
                           <Select
                             value={glmApiMode}
@@ -374,9 +373,8 @@ const AISettingsPage = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {/* TODO: replace with i18n keys */}
-                              <SelectItem value="standard">标准 API</SelectItem>
-                              <SelectItem value="coding">编码套餐</SelectItem>
+                              <SelectItem value="standard">{t("dashboard.settings.ai.glm.apiMode.standard")}</SelectItem>
+                              <SelectItem value="coding">{t("dashboard.settings.ai.glm.apiMode.coding")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>

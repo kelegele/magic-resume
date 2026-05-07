@@ -212,6 +212,20 @@
           "description": "支持润色、语法检查和 PDF 图片识别导入。推荐模型 ID：gemini-flash-latest",
           "apiKey": "Gemini API Key",
           "modelId": "Gemini 模型 ID"
+        },
+        "glm": {
+          "title": "GLM (智谱AI)",
+          "description": "支持润色、语法检查和 PDF 图片识别导入。推荐文本模型：glm-5.1，识图模型：glm-5v-turbo",
+          "apiKey": "GLM API Key",
+          "textModel": "文本模型 ID",
+          "visionModel": "识图模型 ID",
+          "textModelId": "文本模型 ID",
+          "visionModelId": "识图模型 ID",
+          "apiModeLabel": "API 模式",
+          "apiMode": {
+            "standard": "标准 API",
+            "coding": "编码套餐"
+          }
         }
       }
     },

@@ -211,6 +211,20 @@
           "description": "Supports polish, grammar check, and PDF image resume import. Recommended model: gemini-flash-latest",
           "apiKey": "Gemini API Key",
           "modelId": "Gemini Model ID"
+        },
+        "glm": {
+          "title": "GLM (Zhipu AI)",
+          "description": "Supports polish, grammar check, and PDF image resume import. Recommended text model: glm-5.1, vision model: glm-5v-turbo",
+          "apiKey": "GLM API Key",
+          "textModel": "Text Model ID",
+          "visionModel": "Vision Model ID",
+          "textModelId": "Text Model ID",
+          "visionModelId": "Vision Model ID",
+          "apiModeLabel": "API Mode",
+          "apiMode": {
+            "standard": "Standard API",
+            "coding": "Coding Plan"
+          }
         }
       }
     },
