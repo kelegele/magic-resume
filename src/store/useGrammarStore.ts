@@ -100,7 +100,10 @@ export const useGrammarStore = create<GrammarStore>((set, get) => ({
       openaiModelId,
       openaiApiEndpoint,
       geminiApiKey,
-      geminiModelId
+      geminiModelId,
+      glmApiKey,
+      glmTextModelId,
+      glmApiMode
     } = useAIConfigStore.getState();
 
     const config = AI_MODEL_CONFIGS[selectedModel];
@@ -111,7 +114,9 @@ export const useGrammarStore = create<GrammarStore>((set, get) => ({
           ? openaiApiKey
           : selectedModel === "gemini"
             ? geminiApiKey
-            : deepseekApiKey;
+            : selectedModel === "glm"
+              ? glmApiKey
+              : deepseekApiKey;
     const modelId =
       selectedModel === "doubao"
         ? doubaoModelId
@@ -119,7 +124,9 @@ export const useGrammarStore = create<GrammarStore>((set, get) => ({
           ? openaiModelId
           : selectedModel === "gemini"
             ? geminiModelId
-            : deepseekModelId;
+            : selectedModel === "glm"
+              ? glmTextModelId
+              : deepseekModelId;
 
     set({ isChecking: true });
 
@@ -134,7 +141,7 @@ export const useGrammarStore = create<GrammarStore>((set, get) => ({
           apiKey,
           model: config.requiresModelId ? modelId : config.defaultModel,
           modelType: selectedModel,
-          apiEndpoint: selectedModel === "openai" ? openaiApiEndpoint : undefined,
+          apiEndpoint: selectedModel === "openai" ? openaiApiEndpoint : selectedModel === "glm" ? glmApiMode : undefined,
         }),
       });
 
